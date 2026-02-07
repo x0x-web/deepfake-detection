@@ -1,0 +1,6 @@
+flask
+tensorflow
+opencv-python
+numpy
+# matplotlib # Optional, for visualization if needed
+# tqdm # Optional, used in notebook/training
