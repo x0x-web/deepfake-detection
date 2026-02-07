@@ -21,10 +21,25 @@ const predictVideo = async (req, res) => {
         });
 
         const result = await response.json();
+
+        // Delete the file after prediction
+        fs.unlink(filePath, (err) => {
+            if (err) console.error("Error deleting file:", err);
+            else console.log("File deleted successfully");
+        });
+
         return res.status(200).json(result);
     } catch (error) {
         console.log(error);
         console.log("error in predict video");
+
+        // Clean up file if it exists
+        if (req.file && req.file.path) {
+            fs.unlink(req.file.path, (err) => {
+                if (err) console.error("Error deleting file on error:", err);
+            });
+        }
+
         return res.status(500).json({ message: "Internal server error" });
     }
 };
