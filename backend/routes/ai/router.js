@@ -6,7 +6,7 @@ import authUser from "../helper/authorizeUser.js";
 const router = Router()
 
 
-router.post("/predict",authUser,multerUpload.single("video"),predictVideo)
+router.post("/predict",multerUpload.single("video"),predictVideo)
 
 
 
