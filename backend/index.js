@@ -3,6 +3,8 @@ import dotenv from "dotenv";
 import dbConnection from "./configurations/model/connect.js";
 import userRouter from "./routes/authentication/router.js";
 import aiRouter from "./routes/ai/router.js"
+import subscriptionRouter from "./routes/subscription/router.js"
+import historyRouter from "./routes/history/router.js"
 import cors from "cors"
 dotenv.config();
 const app = express();
@@ -11,6 +13,8 @@ app.use(express.json());
 app.use(express.urlencoded({extended:true}))
 app.use("/user", userRouter);
 app.use("/ai", aiRouter);
+app.use("/subscription", subscriptionRouter);
+app.use("/history", historyRouter);
 app.get("/", (req, res) => {
     res.send("hello world");
 });

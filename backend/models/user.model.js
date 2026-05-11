@@ -17,6 +17,15 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    plan: {
+      type: String,
+      enum: ["free", "pro", "premium"],
+      default: "free",
+    },
+    predictionsUsed: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

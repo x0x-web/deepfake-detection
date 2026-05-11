@@ -19,10 +19,10 @@ const registerUser = async (req, res) => {
       return res.status(400).json({ message: "the email already exist" });
     }
     
-    if (password.length <= 6) {
+    if (!validator.isStrongPassword(password)) {
       return res
         .status(400)
-        .json({ message: "password must be atleast 6 chars" });
+        .json({ message: "the password is weak" });
     }
     const hash = bcrypt.hashSync(password, 10);
 

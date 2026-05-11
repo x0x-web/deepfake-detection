@@ -1,5 +1,8 @@
 import fs from "fs";
 import path from "path";
+import History from "../../../models/history.model.js";
+
+const PLAN_LIMITS = { free: 5, pro: 20, premium: Infinity };
 
 const predictVideo = async (req, res) => {
     try {
@@ -28,7 +31,37 @@ const predictVideo = async (req, res) => {
             else console.log("File deleted successfully");
         });
 
-        return res.status(200).json(result);
+        // Increment predictions used
+        const userDoc = req.userDoc;
+        if (userDoc) {
+            userDoc.predictionsUsed += 1;
+            await userDoc.save();
+        }
+
+        // Save prediction to history
+        try {
+            const label = result.result || result.prediction || result.label || "Unknown";
+            await History.create({
+                userId: req.user.id,
+                fileName: req.file.originalname,
+                result: label.toUpperCase() === "FAKE" ? "FAKE" : "REAL",
+                confidence: result.score || result.confidence || result.probability || null,
+                framesProcessed: result.frames_processed || 0,
+            });
+        } catch (historyErr) {
+            console.log("Error saving history:", historyErr.message);
+            // Don't fail the whole request if history save fails
+        }
+
+        const limit = PLAN_LIMITS[userDoc?.plan] || PLAN_LIMITS.free;
+        return res.status(200).json({
+            ...result,
+            usage: {
+                plan: userDoc?.plan || "free",
+                predictionsUsed: userDoc?.predictionsUsed || 0,
+                limit: limit === Infinity ? "unlimited" : limit,
+            },
+        });
     } catch (error) {
         console.log(error);
         console.log("error in predict video");
